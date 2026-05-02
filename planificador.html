@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obedience App Planner - Dinámica a Distancia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+
+        :root {
+            --bdsm-red: #9b1c1c;
+            --bdsm-black: #121212;
+            --soft-blue: #dbeafe;
+            --soft-pink: #fce7f3;
+            --soft-teal: #f0fdfa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #f3f4f6;
+            padding-top: 1rem;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-active {
+            border-bottom: 3px solid var(--bdsm-red) !important;
+            color: #ef4444 !important;
+        }
+
+        .bdsm-glow {
+            box-shadow: 0 0 15px rgba(155, 28, 28, 0.2);
+        }
+
+        .care-glow {
+            box-shadow: 0 0 15px rgba(147, 197, 253, 0.15);
+        }
+
+        .nav-btn {
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        /* Estilo personalizado para el scroll */
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scroll::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.01);
+        }
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 10px;
+        }
+
+        /* Botón estilo Planner */
+        .btn-planner {
+            background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%);
+            border: 1px solid #991b1b;
+            box-shadow: 0 4px 15px rgba(155, 28, 28, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-planner:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(155, 28, 28, 0.5);
+            background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+        }
+        @media (max-width: 640px) {
+    /* En móviles el botón es un poco más pequeño para no estorbar */
+    .fixed.top-4.left-4 {
+        top: 0.75rem;
+        left: 0.75rem;
+        padding: 0.5rem;
+    }
+    .fixed.top-4.left-4 span {
+        display: none; /* Oculta el texto "Regresar" y deja solo la flecha en móviles muy pequeños */
+    }
+}
+    </style>
+</head>
+<body class="antialiased selection:bg-stone-300">
+<div class="max-w-6xl mx-auto px-4 py-8 animate-in">
+    <a href="index.html" class="fixed top-4 left-[-200px] z-50 flex items-center gap-2 px-3 py-2 bg-black/40 backdrop-blur-md border border-white/10 rounded-lg text-gray-400 hover:text-red-500 hover:border-red-900/50 hover:bg-black/60 transition-all duration-300 group">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+    </svg>
+    <span class="text-xs font-bold uppercase tracking-widest">Regresar</span>
+    </a>
+
+        <!-- Section: Interactive Dashboard -->
+        <section class="mb-16 glass-card overflow-hidden bdsm-glow">
+            
+            <!-- Dashboard Navigation -->
+            <div class="bg-white/5 px-4 pt-4 border-b border-white/10 flex flex-wrap gap-4" id="main-tabs">
+                <button onclick="setView('tareas_ella')" id="tab-tareas_ella" class="tab-active pb-3 px-2 text-sm md:text-base transition-colors nav-btn">Tareas para Ella</button>
+                <button onclick="setView('tareas_el')" id="tab-tareas_el" class="pb-3 px-2 text-sm md:text-base transition-colors nav-btn text-gray-400">Tareas para Él</button>
+                <button onclick="setView('premios')" id="tab-premios" class="pb-3 px-2 text-sm md:text-base transition-colors nav-btn text-gray-400">Premios</button>
+                <button onclick="setView('castigos')" id="tab-castigos" class="pb-3 px-2 text-sm md:text-base transition-colors nav-btn text-gray-400">Castigos</button>
+            </div>
+
+            <!-- Dashboard Content Area -->
+            <div class="p-6">
+                
+                <!-- Sub-filters -->
+                <div class="flex flex-wrap gap-3 mb-6" id="sub-filters">
+                    <!-- Inyectado vía JS -->
+                </div>
+
+                <!-- Dynamic List Container -->
+                <div class="bg-black/20 rounded-xl border border-white/5 p-4 h-[500px] overflow-y-auto custom-scroll">
+                    <ul id="item-list" class="space-y-3">
+                        <!-- Items inyectados vía JS -->
+                    </ul>
+                </div>
+                
+                <!-- Counter -->
+                <div class="mt-4 text-sm text-gray-500 text-right" id="item-counter">
+                    Mostrando 0 elementos
+                </div>
+            </div>
+        </section>
+
+        <!-- Section: Visualización de Datos -->
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-6 border-b pb-2 border-white/10 text-white">Balance de la Dinámica</h2>
+            
+            <div class="glass-card p-8 flex flex-col md:flex-row items-center gap-8 care-glow">
+                <div class="w-full md:w-1/2">
+                    <div class="chart-container">
+                        <canvas id="balanceChart"></canvas>
+                    </div>
+                </div>
+                <div class="w-full md:w-1/2 space-y-4">
+                    <h3 class="text-lg font-bold text-red-500">Análisis Estructural</h3>
+                    <p class="text-sm text-gray-300">El sistema consta de 200 acciones estructuradas para mantener el equilibrio emocional y de poder:</p>
+                    <ul class="text-sm space-y-3">
+                        <li class="flex items-center"><span class="w-3 h-3 bg-cyan-400 rounded-full mr-3"></span><b>Autocuidado:</b> Mitiga la ansiedad y respeta el espacio.</li>
+                        <li class="flex items-center"><span class="w-3 h-3 bg-red-700 rounded-full mr-3"></span><b>BDSM / Sensual:</b> Escalada de tensión y fetiche.</li>
+                        <li class="flex items-center"><span class="w-3 h-3 bg-amber-500 rounded-full mr-3"></span><b>Premios:</b> Refuerzo positivo y afecto.</li>
+                        <li class="flex items-center"><span class="w-3 h-3 bg-gray-600 rounded-full mr-3"></span><b>Castigos:</b> Disciplina y restauración de la tensión.</li>
+                    </ul>
+                    <div class="mt-6 p-4 bg-red-950/20 rounded border border-red-900/30 text-xs text-gray-400 italic">
+                        "La anticipación generada por las tareas de lunes a viernes culmina en el encuentro semanal."
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        // --- DATA LAYER ---
+        // 200 items exactly as requested, tailored to the specific psychological profiles.
+
+        const dataStore = {
+            tareas_ella: [
+                // Autocuidado (25) - Focus: Low pressure, routine, gentle connection (Avoidant profile)
+                { category: 'Autocuidado', type: 'Normal', text: 'Beber 2 litros de agua hoy. Envíame foto de tu botella vacía al final del día.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Realizar tu rutina de skincare nocturna con calma y consciencia.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Meditar o hacer ejercicios de respiración por 5 minutos antes de dormir.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Leer 10 páginas de un libro que no sea de estudio/trabajo.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Dar un paseo de 15 minutos al aire libre sin mirar el celular.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Comer al menos una porción de fruta fresca hoy.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Estiramientos suaves de 10 minutos al despertar.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Escribir 3 cosas por las que estás agradecida hoy en una libreta.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Desconexión digital: Apagar pantallas 30 minutos antes de dormir.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Escuchar un podcast o música relajante mientras te arreglas.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Tomar un té o infusión caliente a media tarde.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Dormir al menos 7.5 horas esta noche.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Organizar tu espacio de trabajo por 10 minutos.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Aplicarte crema hidratante en todo el cuerpo después del baño.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Elegir tu ropa para mañana la noche anterior.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Hacer una comida completa sentada en la mesa, sin televisión.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Escribirme un mensaje corto (sin obligación de responder al instante) contándome tu parte favorita del día.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Hacerte un masaje en los pies o manos con loción.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Dedicar 20 minutos a un hobby que disfrutes sola.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Tomar una ducha ligeramente más fría al final para activar la circulación.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'No posponer la alarma hoy; levantarse al primer aviso.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Revisar tus finanzas personales o agenda de la semana por 15 minutos.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Comprar o preparar tu snack favorito para la tarde.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Practicar una postura de yoga (ej. pose del niño) por 2 minutos.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Frente al espejo, decir una cualidad positiva sobre ti misma en voz alta.' },
+
+                // BDSM / Sensual (25) - Focus: Slow escalation, from very soft to moderate, building anticipation. (Novice, Low Libido)
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 1] Llevar puesta ropa interior de encaje o de un color que yo elija durante tu día de trabajo.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 1] Enviarme una nota de voz de 10 segundos susurrando "Buenos días, Señor" (o el título elegido).' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 1] Buscar y leer un artículo introductorio sobre un fetiche que te cause curiosidad y comentármelo.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 1] Enviarme una foto sugerente pero con ropa (ej. escote sutil, forma de las piernas).' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 2] Pasar un cubito de hielo por tu cuello y escote, y describirme por texto qué se siente.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 2] Usar un collar discreto (choker) bajo la ropa cuando salgas, como símbolo de pertenencia.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 2] Dormir sin ropa interior esta noche pensando en nuestro próximo encuentro.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 2] Enviarme una foto de la lencería que usarás cuando nos veamos el fin de semana.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 2] Escribir en tu muslo con un bolígrafo lavable una palabra que yo te asigne (ej. "Suya").' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 3] Edging leve: Estimularte hasta estar cerca, parar, y no terminar. (Practicar control).' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 3] Enviarme un audio describiendo con detalle qué quieres que te haga este fin de semana.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 3] Darte tres palmadas moderadas en el trasero frente al espejo y enviarme foto de la marca.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 3] Vendarte los ojos por 10 minutos en la cama y escuchar un audio erótico o música sensual.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 4] Pedir permiso formalmente por texto antes de poder tocarte o masturbarte hoy.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 4] Atar tus propias muñecas suavemente con una corbata/pañuelo por 5 minutos y enviarme foto.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 4] Grabar un video corto (15 seg) mostrándome una zona de tu cuerpo que te indique.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 4] Explorar tu cuerpo con una pluma o brocha de maquillaje, enfocándote en sensaciones suaves.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 5] Teasing: Enviarme fotos de un striptease muy lento a lo largo de 3 horas (una prenda cada hora).' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 5] Usar un plug anal pequeño (si hay consentimiento previo) durante 15 minutos en casa.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 5] Arrodillarte 2 minutos frente a la cámara en videollamada corta, en posición de sumisión.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 5] Leer en voz alta (en audio) un relato erótico corto de sumisión que yo te envíe.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 5] Preparar un kit de juego (cuerdas, vendas, juguetes) y tenerlo listo para cuando llegue el finde.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 5] Restricción de orgasmo de lunes a viernes; solo podrás terminar cuando nos veamos.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 5] Enviarme un texto confesando un límite suave que estarías dispuesta a explorar este fin de semana.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: '[Nivel 5] Castidad de palabras: Durante 2 horas, solo puedes responderme "Sí, Señor" o "No, Señor".' }
+            ],
+            tareas_el: [
+                // Autocuidado (25) - Focus: Structure, managing anxiety, physical health (Anxious profile)
+                { category: 'Autocuidado', type: 'Normal', text: 'Ir al gimnasio o hacer tu rutina de ejercicios completa.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Preparar una cena saludable (proteína y vegetales).' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Enviarme un mensaje cariñoso y apagar el celular por 1 hora (para practicar desapego ansioso).' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Hacer 15 minutos de ejercicios de mindfulness o meditación para centrarte.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Recortar tu barba / arreglar tu cabello / rutina de grooming masculina.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Limpiar y ordenar a fondo tu habitación hoy.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Beber 2.5 litros de agua.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Dormir temprano (antes de las 11 PM).' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Avanzar en una tarea de tu trabajo o estudio que has estado posponiendo.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Leer un artículo sobre gestión de la ansiedad en relaciones.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Lavar los platos y dejar la cocina impecable antes de dormir.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Hacer estiramientos de espalda y cuello por 10 minutos.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Llamar a un amigo o familiar con el que no hablas hace tiempo.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Planificar tu presupuesto financiero para la semana.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Escuchar un álbum completo de música clásica o jazz ambiental.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Evitar el consumo de comida chatarra o azúcares refinados todo el día.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Escribir en un diario tus pensamientos cuando sientas ansiedad, en lugar de escribirme a mí inmediatamente.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Preparar tu ropa para toda la semana.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Tomar vitaminas o suplementos si los necesitas.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Hacer 50 flexiones de pecho divididas en el día.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Caminar 10,000 pasos hoy.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Pasar 30 minutos leyendo un libro físico.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Ducha de contraste (agua caliente seguida de 1 minuto de agua fría).' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Organizar los archivos del escritorio de tu computadora.' },
+                { category: 'Autocuidado', type: 'Normal', text: 'Hacer una pequeña donación o un acto de amabilidad anónimo.' },
+
+                // BDSM / Sensual (25) - Focus: High intensity, catering to his fetishes, submission to her, utilizing his high libido (Fetishist/High Libido)
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Castidad/Denegación: No puedes tocarte en absoluto hoy sin mi permiso explícito.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Edging extremo: Llevate al borde del orgasmo 3 veces hoy, pero tienes estrictamente prohibido terminar.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Servicio: Pide a domicilio mi comida favorita y págala para que llegue a mi casa hoy.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Adoración (Fetiche): Escribirme un texto de 300 palabras describiendo exactamente qué le harías a mis pies/zapatos este fin de semana.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Humillación leve (Consensuada): Graba un video de rodillas rogando que te deje correrte este fin de semana.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Impacto auto-infligido: Date 10 nalgadas fuertes o usa un implemento que tengas, y envíame la foto de la marca roja.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Privación sensorial: Acuéstate en la cama, vendado y con auriculares sin sonido, solo con tus pensamientos fetiche durante 20 mins.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Exhibicionismo discreto: Sal a la calle sin ropa interior bajo tus pantalones y envíame un video corto demostrándolo.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Tareas domésticas sumisas: Limpia el baño de tu casa de rodillas (sin pantalones).' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Castigo de escritura: Escribe a mano 50 veces "Soy propiedad de mi Diosa y debo controlar mis impulsos" y manda foto.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Preparación de Fetiche: Compra online un accesorio específico (medias, collar, etc.) que yo te indique, para que yo lo use el fin de semana.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Estimulación térmica: Aplica cera caliente (apta para masajes/juego) o hielo en tus pezones por 5 minutos.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Arruinar el orgasmo (Ruin orgams): Si te doy permiso para masturbarte, debes detener toda estimulación física en el segundo exacto que empieces a eyacular.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Adoración de fotos: Pasa 15 minutos mirando una foto mía específica que te enviaré, no puedes hacer nada más.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Usar lencería: Usa una prenda interior femenina (si es tu fetiche) bajo tu ropa de trabajo todo el día.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Videollamada silenciosa: Te llamaré por 5 minutos. Solo puedes mirarme, de rodillas, sin decir una sola palabra a menos que te pregunte.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Control de respiración (Leve/Seguro): Usa un pañuelo en la boca como mordaza ligera mientras haces tus tareas de la casa.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Planificación de escena: Escribe un guion detallado paso a paso de una escena fetiche que quieras que hagamos el sábado.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Castidad prolongada: Si tienes una jaula de castidad, debe permanecer cerrada de lunes a viernes. Yo tengo la llave virtual.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Tributo: Cómprame una tarjeta de regalo pequeña (ej. para un café) como muestra de sumisión financiera.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Posición de estrés: Mantén una sentadilla en la pared (wall sit) por 2 minutos mientras repites mi nombre.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Estimulación frustrante: Usa lubricante y acaríciate muy suavemente por 30 minutos, prohibido llegar al 70% de excitación.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Marca temporal: Pon un chupetón (hickey) en tu propio brazo/pecho en un lugar donde tú lo veas pero los demás no, como recordatorio mío.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Servicio de investigación: Investiga un fetiche que *yo* te asigne (aunque no te guste a ti) y hazme un resumen de 1 página.' },
+                { category: 'BDSM/Sensual', type: 'BDSM', text: 'Petición formal: Escribe un correo electrónico formal detallando por qué mereces que te quite la ropa este fin de semana.' }
+            ],
+            premios: [
+                // Para Él (de Ella) - 12 Normales, 13 BDSM
+                { recipient: 'Él', type: 'Normal', category: 'Premios', text: 'Te invito a tu cena favorita cuando nos veamos.' },
+                { recipient: 'Él', type: 'Normal', category: 'Premios', text: 'Jugamos una partida online de tu videojuego favorito juntos.' },
+                { recipient: 'Él', type: 'Normal', category: 'Premios', text: 'Vemos una película que tú elijas por videollamada.' },
+                { recipient: 'Él', type: 'Normal', category: 'Premios', text: 'Te mando un desayuno sorpresa a tu casa.' },
+                { recipient: 'Él', type: 'Normal', category: 'Premios', text: 'Te hago un masaje relajante de 20 minutos el fin de semana.' },
+                { recipient: 'Él', type: 'Normal', category: 'Premios', text: 'Te escucho hablar de tu tema favorito/hobby sin interrumpir por 15 mins.' },
+                { recipient: 'Él', type: 'Normal', category: 'Premios', text: 'Día libre de tareas de autocuidado mañana.' },
+                { recipient: 'Él', type: 'Normal', category: 'Premios', text: 'Te envío una selfie sonriendo especialmente para ti.' },
+                { recipient: 'Él', type: 'Normal', category: 'Premios', text: 'Te dedico una canción.' },
+                { recipient: 'Él', type: 'Normal', category: 'Premios', text: 'Yo pago la salida del sábado.' },
+                { recipient: 'Él', type: 'Normal', category: 'Premios', text: 'Te preparo tu postre favorito.' },
+                { recipient: 'Él', type: 'Normal', category: 'Premios', text: 'Elegimos juntos la próxima serie para maratonear.' },
+                
+                { recipient: 'Él', type: 'BDSM', category: 'Premios', text: 'Permiso de orgasmo (Release): Puedes terminar hoy visualizando nuestro próximo encuentro.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Premios', text: 'Te envío una foto mía vistiendo algo específico de tu fetiche.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Premios', text: 'Audio de "Buen chico": Un audio mío reconociendo tu sumisión y obediencia.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Premios', text: 'Este fin de semana, me pondré exactamente la lencería que tú elijas.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Premios', text: 'Dominación verbal por texto: Te enviaré mensajes sucios y dominantes por 10 minutos.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Premios', text: 'Acceso a un video corto exclusivo mío tocándome.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Premios', text: 'Tienes derecho a pedirme que realice un acto sumiso (aprobado previamente) el finde.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Premios', text: 'Fin de semana de "Servicio Activo": Te dejaré adorar mi cuerpo sin restricciones de tiempo.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Premios', text: 'Te permito llamarme de madrugada para escucharme respirar.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Premios', text: 'Pase de "Sin Castigos": Inmunidad a castigos por 24 horas.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Premios', text: 'Te envío una prenda íntima usada por correo (o te la doy el finde).' },
+                { recipient: 'Él', type: 'BDSM', category: 'Premios', text: 'Acepto participar en un rol específico (roleplay) que a ti te guste mucho el sábado.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Premios', text: 'Te marco como mío: Te pondré un chupetón o marca visible (si puedes ocultarla en el trabajo) el fin de semana.' },
+
+                // Para Ella (de Él) - 13 Normales, 12 BDSM
+                { recipient: 'Ella', type: 'Normal', category: 'Premios', text: 'Te envío flores o tu dulce favorito a domicilio.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Premios', text: 'Fin de semana sin decisiones: Yo planifico toda la cita y tú solo te relajas.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Premios', text: 'Te compro ese libro o pequeño capricho que querías.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Premios', text: 'Sesión de spa en casa el fin de semana (mascarillas, baño de espuma).' },
+                { recipient: 'Ella', type: 'Normal', category: 'Premios', text: 'Escribo una carta a mano detallando 10 cosas que amo de ti.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Premios', text: 'Día de desconexión: No tienes que responderme mensajes por 12 horas si necesitas espacio.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Premios', text: 'Hago una tarea que detestas (ej. organizarte un excel, buscar un vuelo).' },
+                { recipient: 'Ella', type: 'Normal', category: 'Premios', text: 'Te invito un café/desayuno por delivery a tu trabajo.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Premios', text: 'Vemos juntos online ese documental o serie que a mí no me gusta pero a ti sí.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Premios', text: 'Te envío un playlist de Spotify creado solo para ti.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Premios', text: 'Aporto dinero para tu alcancía/ahorro para un viaje.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Premios', text: 'Doble premio: Puedes canjear esto por dos premios normales cuando quieras.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Premios', text: 'Te llamo solo para decirte buenas noches, sin alargar la charla.' },
+
+                { recipient: 'Ella', type: 'BDSM', category: 'Premios', text: 'Aftercare de lujo: Después de jugar el finde, te baño, te seco y te visto.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Premios', text: 'Compro un juguete nuevo (suave/introductorio) para usarlo en ti el finde.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Premios', text: 'Masaje sensual de cuerpo completo sin intención de penetración.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Premios', text: 'Validación de sumisión: Un texto largo reafirmando lo buena sumisa que eres y lo orgulloso que estoy.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Premios', text: 'Cena en personaje: Salimos a cenar y mantengo una actitud sutilmente dominante en público.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Premios', text: 'Te regalo un collar de día (Day collar) hermoso y discreto como joyería.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Premios', text: 'Estimulación enfocada solo en ti: Orgasmos ilimitados garantizados el fin de semana.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Premios', text: 'Control suave: Elegiré toda tu ropa para el sábado, de pies a cabeza.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Premios', text: 'Te permito atarme a mí este fin de semana para que experimentes control si lo deseas.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Premios', text: 'Voto de silencio: Prometo no hablar durante 15 minutos mientras tú diriges la acción el finde.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Premios', text: 'Beso con los ojos vendados: Te vendaré los ojos nada más verte el sábado y te besaré largamente.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Premios', text: 'Cancelación de tarea difícil: Puedes saltarte una tarea BDSM que te cause mucha inseguridad sin penalización.' }
+            ],
+            castigos: [
+                // Para Ella (de Él) - 13 Normales, 12 BDSM
+                { recipient: 'Ella', type: 'Normal', category: 'Castigos', text: 'Prohibición de redes sociales (Instagram/TikTok) por 24 horas.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Castigos', text: 'Despertar 30 minutos más temprano mañana.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Castigos', text: 'Leer un artículo serio o educativo y enviarme un resumen.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Castigos', text: 'Tú pagas la cuenta en nuestra próxima salida.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Castigos', text: 'Hacer 30 sentadillas extra en tu rutina.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Castigos', text: 'No tomar café/dulces por 24 horas.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Castigos', text: 'Escribir una lista de 5 cosas en las que debes mejorar.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Castigos', text: 'Lavar mi auto o hacer una tarea tediosa por mí el fin de semana.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Castigos', text: 'Ducha completamente fría de 2 minutos.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Castigos', text: 'Borrar una app de entretenimiento de tu celular por 2 días.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Castigos', text: 'Donar $10 (o equivalente) a una caridad.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Castigos', text: 'Prohibido escuchar música con letra mientras trabajas/estudias hoy.' },
+                { recipient: 'Ella', type: 'Normal', category: 'Castigos', text: 'Escribirme un mensaje de disculpa formal.' },
+
+                { recipient: 'Ella', type: 'BDSM', category: 'Castigos', text: 'Restricción de orgasmo estricta: Sumar 3 días extra a la prohibición de tocarte.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Castigos', text: 'Tiempo en la esquina (Corner time): De rodillas, mirando a la pared por 10 minutos.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Castigos', text: 'Castigo físico leve (Finde): 10 nalgadas sobre las rodillas.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Castigos', text: 'Usar lencería incómoda/poco práctica bajo la ropa todo el día laboral.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Castigos', text: 'Pérdida de privilegios: Prohibido usar almohada para dormir esta noche.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Castigos', text: 'Escritura de líneas: Escribir 50 veces "Debo obedecer a mi Dominante sin dudar".' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Castigos', text: 'Grabación de disculpa: Video de 1 minuto arrodillada pidiendo perdón por fallar.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Castigos', text: 'Sobrestimulación (Finde): Uso de vibrador potente hasta el límite de sensibilidad antes del orgasmo, luego parar.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Castigos', text: 'Posición de estrés: Mantener los brazos en cruz (T-pose) sosteniendo libros por 3 minutos.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Castigos', text: 'Privación de beso: El sábado, no te daré besos en los labios durante las primeras 3 horas.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Castigos', text: 'Etiqueta estricta: Debes dirigirte a mí como "Señor" al principio y final de CADA mensaje por 24 hrs.' },
+                { recipient: 'Ella', type: 'BDSM', category: 'Castigos', text: 'Dormir atada: Atar tus manos ligeramente juntas (con algo suave) para dormir.' },
+
+                // Para Él (de Ella) - 12 Normales, 13 BDSM
+                { recipient: 'Él', type: 'Normal', category: 'Castigos', text: 'Hacer 100 flexiones extra a lo largo del día.' },
+                { recipient: 'Él', type: 'Normal', category: 'Castigos', text: 'Lavar mis platos y limpiar mi cocina el fin de semana.' },
+                { recipient: 'Él', type: 'Normal', category: 'Castigos', text: 'Prohibición de videojuegos/series por 48 horas.' },
+                { recipient: 'Él', type: 'Normal', category: 'Castigos', text: 'Financiar mi capricho: Comprarme algo de mi carrito de Amazon (bajo $20).' },
+                { recipient: 'Él', type: 'Normal', category: 'Castigos', text: 'Correr 5km adicionales esta semana.' },
+                { recipient: 'Él', type: 'Normal', category: 'Castigos', text: 'Ducha de agua helada por 5 minutos.' },
+                { recipient: 'Él', type: 'Normal', category: 'Castigos', text: 'Despertar 1 hora antes y usar ese tiempo para leer.' },
+                { recipient: 'Él', type: 'Normal', category: 'Castigos', text: 'Ayuno intermitente: Saltar el desayuno y almorzar tarde (si es saludable para ti).' },
+                { recipient: 'Él', type: 'Normal', category: 'Castigos', text: 'No puedes iniciar la conversación por texto mañana, debes esperar a que yo te escriba (Manejo de ansiedad).' },
+                { recipient: 'Él', type: 'Normal', category: 'Castigos', text: 'Escribir un ensayo de 1 página sobre por qué la paciencia es importante.' },
+                { recipient: 'Él', type: 'Normal', category: 'Castigos', text: 'Tú conduces a todos lados el fin de semana.' },
+                { recipient: 'Él', type: 'Normal', category: 'Castigos', text: 'Día sin café ni energizantes.' },
+
+                { recipient: 'Él', type: 'BDSM', category: 'Castigos', text: 'Denegación extendida: Sumar 1 semana a la prohibición de orgasmos.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Castigos', text: 'Humillación leve: Enviarme una foto tuya usando algo ridículo o femenino.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Castigos', text: 'Edging forzado: Hacer edging por 45 minutos seguidos con cronómetro y luego detenerse por completo.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Castigos', text: 'Impacto severo (Auto o Finde): 20 nalgadas fuertes con un objeto que yo elija.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Castigos', text: 'Postura sumisa: Permanecer de rodillas en el piso desnudo por 15 minutos en silencio.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Castigos', text: 'Servidumbre absoluta: Durante 4 horas el fin de semana, no puedes sentarte en muebles, solo en el piso a mis pies.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Castigos', text: 'Castidad estricta: Dormir con el dispositivo de castidad puesto toda la semana.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Castigos', text: 'Prohibición de fetiche: No puedes hablar, ver ni practicar tu fetiche principal por 2 semanas.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Castigos', text: 'Ruined Orgasm obligatorio: La próxima vez que te deje terminar, debe ser arruinado.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Castigos', text: 'Limpieza fetiche: Limpiar mis zapatos con tu lengua el fin de semana.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Castigos', text: 'Privación de atención: Ignoraré tus mensajes calientes/BDSM durante 24 horas completas.' },
+                { recipient: 'Él', type: 'BDSM', category: 'Castigos', text: 'Líneas de sumisión: Escribir 100 veces "Soy menos que ella y vivo para servirla".' },
+                { recipient: 'Él', type: 'BDSM', category: 'Castigos', text: 'Marcas visibles: Usar pinzas (clothespins) en los pezones por 10 minutos y mandar foto del enrojecimiento.' }
+            ]
+        };
+
+        // --- APP STATE ---
+        let currentView = 'tareas_ella'; // Vista por defecto
+        let currentSubFilter = 'Todos'; // Filtro por defecto
+
+        // --- DOM ELEMENTS ---
+        const itemListDiv = document.getElementById('item-list');
+        const itemCounterDiv = document.getElementById('item-counter');
+        const subFiltersDiv = document.getElementById('sub-filters');
+        
+        // --- LOGIC ---
+
+        function init() {
+            renderSubFilters();
+            renderList();
+            initChart();
+        }
+
+        function setView(view) {
+            currentView = view;
+            currentSubFilter = 'Todos'; // Resetear subfiltro al cambiar de vista
+            
+            // Actualizar Interfaz de Pestañas (Negro y Rojo)
+            const tabs = ['tareas_ella', 'tareas_el', 'premios', 'castigos'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                if (t === view) {
+                    el.classList.add('tab-active');
+                    el.classList.remove('text-gray-400');
+                } else {
+                    el.classList.remove('tab-active');
+                    el.classList.add('text-gray-400');
+                }
+            });
+
+            renderSubFilters();
+            renderList();
+        }
+
+        function setSubFilter(filter) {
+            currentSubFilter = filter;
+            renderSubFilters(); // Re-renderizar para actualizar estilos activos
+            renderList();
+        }
+
+        function renderSubFilters() {
+            let filters = ['Todos'];
+            if (currentView === 'tareas_ella' || currentView === 'tareas_el') {
+                filters = ['Todos', 'Autocuidado', 'BDSM/Sensual'];
+            } else if (currentView === 'premios' || currentView === 'castigos') {
+                filters = ['Todos', 'Para Él', 'Para Ella', 'Normal', 'BDSM'];
+            }
+
+            let html = '';
+            filters.forEach(f => {
+                const isActive = f === currentSubFilter;
+                // Estilos adaptados al tema oscuro: Bordes rojos y fondos negros
+                const baseClasses = "px-4 py-1.5 rounded-full text-xs font-medium transition-all border cursor-pointer";
+                const activeClasses = "bg-red-900 text-white border-red-600 shadow-[0_0_10px_rgba(155,28,28,0.4)]";
+                const inactiveClasses = "bg-black/40 text-gray-400 border-white/10 hover:border-red-900/50 hover:text-gray-200";
+                
+                html += `<button onclick="setSubFilter('${f}')" class="${baseClasses} ${isActive ? activeClasses : inactiveClasses}">${f}</button>`;
+            });
+            subFiltersDiv.innerHTML = html;
+        }
+
+        function renderList() {
+            const data = dataStore[currentView];
+            let filteredData = data;
+
+            // Aplicar Filtros
+            if (currentSubFilter !== 'Todos') {
+                if (currentView.startsWith('tareas')) {
+                    filteredData = data.filter(item => item.category === currentSubFilter);
+                } else {
+                    if (currentSubFilter === 'Para Él') filteredData = data.filter(item => item.recipient === 'Él');
+                    else if (currentSubFilter === 'Para Ella') filteredData = data.filter(item => item.recipient === 'Ella');
+                    else if (currentSubFilter === 'Normal' || currentSubFilter === 'BDSM') filteredData = data.filter(item => item.type === currentSubFilter);
+                }
+            }
+
+            // Renderizar HTML con estilo Glassmorphism Oscuro
+            let html = '';
+            if (filteredData.length === 0) {
+                html = `<li class="text-center text-gray-500 py-8 italic">No hay elementos bajo este rigor.</li>`;
+            } else {
+                filteredData.forEach((item, index) => {
+                    // Colores de badges adaptados para fondo oscuro
+                    let badgeColor = 'bg-white/5 text-gray-300 border-white/10';
+                    let icon = '•';
+                    
+                    if (item.category === 'Autocuidado' || (item.type === 'Normal' && currentView.startsWith('tareas'))) {
+                        badgeColor = 'bg-cyan-950/30 text-cyan-400 border-cyan-800/50';
+                        icon = '🌿';
+                    } else if (item.category === 'BDSM/Sensual' || item.type === 'BDSM') {
+                        badgeColor = 'bg-red-950/40 text-red-500 border-red-900/50';
+                        icon = '🔥';
+                    } else if (item.category === 'Premios' && item.type === 'Normal') {
+                        badgeColor = 'bg-amber-950/30 text-amber-500 border-amber-800/50';
+                        icon = '🎁';
+                    } else if (item.category === 'Castigos' && item.type === 'Normal') {
+                         badgeColor = 'bg-slate-800/40 text-slate-400 border-slate-700/50';
+                         icon = '⚖️';
+                    }
+
+                    let recipientBadge = '';
+                    if (item.recipient) {
+                        const recColor = item.recipient === 'Él' ? 'bg-indigo-900/30 text-indigo-400' : 'bg-pink-900/30 text-pink-400';
+                        recipientBadge = `<span class="text-[10px] uppercase tracking-tighter px-2 py-0.5 rounded ${recColor} font-bold mr-2">${item.recipient}</span>`;
+                    }
+
+                    html += `
+                        <li class="bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 hover:border-red-900/30 transition-all animate-in" style="animation-delay: ${index * 20}ms">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1 pr-4">
+                                    <div class="mb-2 flex flex-wrap items-center gap-2">
+                                        ${recipientBadge}
+                                        <span class="text-[10px] px-2 py-0.5 rounded border ${badgeColor} font-semibold uppercase tracking-wider">${icon} ${item.type === 'Normal' ? 'Cotidiano' : item.type}</span>
+                                    </div>
+                                    <p class="text-gray-200 text-sm md:text-base leading-relaxed">${item.text}</p>
+                                </div>
+                                <button class="text-gray-600 hover:text-red-500 transition-colors drop-shadow-[0_0_5px_rgba(239,68,68,0.3)]">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </li>
+                    `;
+                });
+            }
+
+            itemListDiv.innerHTML = html;
+            itemCounterDiv.innerText = `Registradas: ${filteredData.length} acciones`;
+        }
+
+        // --- CHART JS (Estilo Neon/Oscuro) ---
+        function initChart() {
+            const ctx = document.getElementById('balanceChart').getContext('2d');
+            
+            const totalAutocuidado = dataStore.tareas_ella.filter(i => i.category === 'Autocuidado').length + dataStore.tareas_el.filter(i => i.category === 'Autocuidado').length;
+            const totalBDSM = dataStore.tareas_ella.filter(i => i.category === 'BDSM/Sensual').length + dataStore.tareas_el.filter(i => i.category === 'BDSM/Sensual').length;
+            const totalPremios = dataStore.premios.length;
+            const totalCastigos = dataStore.castigos.length;
+
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Autocuidado', 'Sensual/BDSM', 'Premios', 'Castigos'],
+                    datasets: [{
+                        data: [totalAutocuidado, totalBDSM, totalPremios, totalCastigos],
+                        // Colores neón sobre negro
+                        backgroundColor: ['#22d3ee', '#9b1c1c', '#f59e0b', '#4b5563'],
+                        borderColor: '#0a0a0a',
+                        borderWidth: 5,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { 
+                                color: '#9ca3af',
+                                font: { family: "'Inter', sans-serif", size: 11 },
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ef4444',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: (context) => ` ${context.label}: ${context.parsed} ítems`
+                            }
+                        }
+                    },
+                    cutout: '75%' // Más delgado para un look más elegante
+                }
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+
+    </script>
+</body>
+</html>

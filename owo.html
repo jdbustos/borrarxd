@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Protocolo de Vinculación D/s</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair_Display:wght@700&family=Inter:wght@300;400;600&display=swap');
+
+        :root {
+            --bdsm-red: #9b1c1c;
+            --bdsm-black: #121212;
+            --soft-blue: #dbeafe;
+            --soft-pink: #fce7f3;
+            --soft-teal: #f0fdfa;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0a0a0a;
+            color: #f3f4f6;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.25rem;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            background: rgba(255, 255, 255, 0.06);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-active {
+            border-bottom: 3px solid var(--bdsm-red);
+            color: #ef4444;
+        }
+
+        .bdsm-glow {
+            box-shadow: 0 0 15px rgba(155, 28, 28, 0.2);
+        }
+
+        .care-glow {
+            box-shadow: 0 0 15px rgba(147, 197, 253, 0.15);
+        }
+
+        .nav-btn {
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+        }
+
+        .scroll-custom::-webkit-scrollbar {
+            height: 4px;
+        }
+        .scroll-custom::-webkit-scrollbar-thumb {
+            background: #374151;
+            border-radius: 10px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-in { animation: fadeIn 0.5s ease-out forwards; }
+    </style>
+</head>
+<body class="p-4 md:p-12">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="text-center mb-16 animate-in">
+            <h1 class="text-5xl md:text-7xl font-bold font-['Playfair_Display'] text-red-700 mb-6 tracking-tighter">
+                Protocolo de Vinculación D/s
+            </h1>
+            <div class="flex flex-col items-center">
+                <p class="text-gray-400 max-w-2xl text-lg italic leading-relaxed">
+                    Diseñada para una relación a distancia (encuentros semanales), equilibrando estilos de apego, niveles de libido y exploración BDSM progresiva.
+                </p>
+                <div class="h-1 w-24 bg-red-800 mt-6 rounded-full"></div>
+            </div>
+        </header>
+
+        <!-- Navegación -->
+        <nav class="flex overflow-x-auto space-x-10 mb-12 pb-4 border-b border-gray-800 scroll-custom justify-start md:justify-center">
+            <button onclick="showTab('teoria')" class="nav-btn tab-active whitespace-nowrap font-bold transition uppercase">Fundamentos</button>
+            <button onclick="showTab('tareas')" class="nav-btn text-gray-500 whitespace-nowrap font-bold transition uppercase">Tareas</button>
+            <button onclick="showTab('premios')" class="nav-btn text-gray-500 whitespace-nowrap font-bold transition uppercase">Premios & Castigos</button>
+            <button onclick="showTab('autocuidado')" class="nav-btn text-gray-500 whitespace-nowrap font-bold transition uppercase">Autocuidado</button>
+            <button onclick="showTab('mapa')" class="nav-btn text-gray-500 whitespace-nowrap font-bold transition uppercase">Mapa de Intimidad</button>
+        </nav>
+
+        <main id="content-area">
+            
+            <!-- Tab: Teoría -->
+            <section id="teoria" class="tab-content block animate-in">
+                <div class="text-center mb-8">
+                    <h3 class="text-2xl font-bold text-white mb-2">Sinergia de Apegos en la Dinámica</h3>
+                    <p class="text-gray-400 text-sm italic">Definición de Perfiles y Objetivos Estratégicos</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-10">
+                    <!-- Perfil Él -->
+                    <div class="glass-card p-8 border-l-4 border-red-800 bdsm-glow">
+                        <h4 class="text-xl font-bold text-red-600 mb-4 tracking-tight uppercase">Perfil: Él (Tú)</h4>
+                        <div class="space-y-4 text-gray-300 leading-relaxed">
+                            <p><strong><i class="fas fa-crown mr-2"></i>Rol Principal:</strong> Dominante (Switch).</p>
+                            <p><strong><i class="fas fa-heart-pulse mr-2"></i>Apego:</strong> Ansioso (Requiere validación y conexión constante).</p>
+                            <p class="italic bg-red-900/10 p-4 rounded-lg border border-red-800/20">
+                                <strong>Objetivo estratégico:</strong> Gestionar la ansiedad a través del control estructurado, recibir tareas sumisas de alta intensidad sensorial para satisfacer el libido durante la semana.
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Perfil Ella -->
+                    <div class="glass-card p-8 border-l-4 border-blue-400 care-glow">
+                        <h4 class="text-xl font-bold text-blue-400 mb-4 tracking-tight uppercase">Perfil: Ella (Tu Pareja)</h4>
+                        <div class="space-y-4 text-gray-300 leading-relaxed">
+                            <p><strong><i class="fas fa-feather mr-2"></i>Rol Principal:</strong> Sumisa (Switch).</p>
+                            <p><strong><i class="fas fa-ghost mr-2"></i>Apego:</strong> Evitativo (Requiere espacio, baja presión, progresión lenta).</p>
+                            <p class="italic bg-blue-900/10 p-4 rounded-lg border border-blue-800/20">
+                                <strong>Objetivo estratégico:</strong> Fomentar la conexión sin abrumar. Tareas BDSM de escalada muy lenta (mindfulness sensual). Sus tareas como Dominante le darán seguridad y control.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Tareas -->
+            <section id="tareas" class="tab-content hidden animate-in">
+                <div class="text-center mb-10">
+                    
+                </div>
+                <div class="grid md:grid-cols-2 gap-10">
+                    <!-- Tareas para el Dominante -->
+                    <div class="space-y-6">
+                        <h3 class="text-xl font-bold text-red-500 flex items-center px-2">
+                            <i class="fas fa-crown mr-3"></i> Responsabilidades del Dom
+                        </h3>
+                        <div class="glass-card p-5">
+                            <p class="font-semibold text-white">Validación de Esfuerzo</p>
+                            <p class="text-sm text-gray-400 mt-1">Reconocer el trabajo de la Sub refuerza su autoestima y su deseo de complacer, transformando la tarea en un acto de amor mutuo.</p>
+                        </div>
+                        <div class="glass-card p-5">
+                            <p class="font-semibold text-white">Mantenimiento de Rituales</p>
+                            <p class="text-sm text-gray-400 mt-1">Liderar la constancia de los rituales demuestra que la relación es una prioridad innegociable, calmando los vacíos de la distancia.</p>
+                        </div>
+                    </div>
+                    <!-- Tareas para la Sumisa -->
+                    <div class="space-y-6">
+                        <h3 class="text-xl font-bold text-blue-400 flex items-center px-2">
+                            <i class="fas fa-heart mr-3"></i> Responsabilidades de la Sub
+                        </h3>
+                        <div class="glass-card p-5">
+                            <p class="font-semibold text-white">Transparencia Radical</p>
+                            <p class="text-sm text-gray-400 mt-1">Reportar estados internos ayuda al Dom a no malinterpretar el silencio como rechazo, fortaleciendo la seguridad del vínculo.</p>
+                        </div>
+                        <div class="glass-card p-5">
+                            <p class="font-semibold text-white">Ofrendas de Cercanía</p>
+                            <p class="text-sm text-gray-400 mt-1">Cada cumplimiento es un recordatorio visual de su entrega, nutriendo el sistema nervioso del Dominante y su sentido de pertenencia.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Premios y Castigos -->
+            <section id="premios" class="tab-content hidden animate-in">
+                <div class="text-center mb-10">
+                    <p class="text-gray-400 italic">"Convertimos la disciplina en un puente, no en un muro."</p>
+                </div>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="glass-card p-8 border-t-2 border-emerald-500/30">
+                        <h4 class="text-emerald-400 font-bold text-lg mb-4 flex items-center">
+                            <i class="fas fa-plus-circle mr-2"></i> Dinámicas de Conexión (Premios)
+                        </h4>
+                        <ul class="space-y-4 text-sm text-gray-300">
+                            <li class="flex items-center"><i class="fas fa-check text-emerald-500 mr-3"></i> <strong>Sesión de Cuidado:</strong> Media hora de charla sin protocolo, centrada solo en afecto puro.</li>
+                            <li class="flex items-center"><i class="fas fa-check text-emerald-500 mr-3"></i> <strong>Elección de Actividad:</strong> Ella elige la película o el tema de la siguiente cita virtual.</li>
+                            <li class="flex items-center"><i class="fas fa-check text-emerald-500 mr-3"></i> <strong>Carta de Validación:</strong> El Dom escribe por qué está orgulloso de su proceso.</li>
+                        </ul>
+                    </div>
+                    <div class="glass-card p-8 border-t-2 border-red-500/30">
+                        <h4 class="text-red-400 font-bold text-lg mb-4 flex items-center">
+                            <i class="fas fa-minus-circle mr-2"></i> Disciplina de Reajuste (Correctivos)
+                        </h4>
+                        <ul class="space-y-4 text-sm text-gray-300">
+                            <li class="flex items-center"><i class="fas fa-exclamation-triangle text-red-500 mr-3"></i> <strong>Aumento de Tareas:</strong> Un reporte extra para restablecer la comunicación perdida.</li>
+                            <li class="flex items-center"><i class="fas fa-exclamation-triangle text-red-500 mr-3"></i> <strong>Escritura de Reflexión:</strong> Analizar juntos qué disparó la desconexión para aprender del error.</li>
+                            <li class="flex items-center"><i class="fas fa-exclamation-triangle text-red-500 mr-3"></i> <strong>Servicio Virtual:</strong> Realizar una acción que facilite las cosas (ej. organizar una agenda).</li>
+                        </ul>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Autocuidado -->
+            <section id="autocuidado" class="tab-content hidden animate-in">
+                <div class="grid md:grid-cols-2 gap-10">
+                    <div class="p-8 rounded-3xl bg-blue-50/5 border border-blue-300/20">
+                        <h3 class="text-2xl font-bold text-blue-200 mb-6 font-['Playfair_Display']">Bienestar Sub</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-blue-200 flex items-center justify-center text-blue-900 mr-4">
+                                    <i class="fas fa-anchor"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-white">Anclaje de Seguridad</p>
+                                    <p class="text-xs text-blue-200/60">Identificar 3 objetos físicos en su habitación que representen el vínculo con el Dom.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-blue-200 flex items-center justify-center text-blue-900 mr-4">
+                                    <i class="fas fa-battery-half"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-white">Gestión de Energía</p>
+                                    <p class="text-xs text-blue-200/60">Aprender a decir "estoy saturada" antes de llegar a la evitación total.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-8 rounded-3xl bg-rose-50/5 border border-rose-300/20">
+                        <h3 class="text-2xl font-bold text-rose-200 mb-6 font-['Playfair_Display']">Bienestar Dom</h3>
+                        <div class="space-y-6">
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-rose-200 flex items-center justify-center text-rose-900 mr-4">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-white">Autorregulación Ansiosa</p>
+                                    <p class="text-xs text-rose-200/60">Técnicas de respiración y escritura antes de emitir una orden desde el miedo.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center">
+                                <div class="w-12 h-12 rounded-full bg-rose-200 flex items-center justify-center text-rose-900 mr-4">
+                                    <i class="fas fa-compass"></i>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-white">Foco Externo</p>
+                                    <p class="text-xs text-rose-200/60">Mantener sus propios hobbies para no asfixiar el espacio de la Sub con su ansiedad.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab: Mapa de Intimidad -->
+            <section id="mapa" class="tab-content hidden animate-in">
+                <div class="text-center mb-12">
+                    <h3 class="text-3xl font-bold font-['Playfair_Display'] text-white">Los Pilares del Puente</h3>
+                    <p class="text-gray-400 mt-2 italic">Nuestra base sólida mientras el cuerpo no está presente.</p>
+                </div>
+                <div class="flex flex-wrap justify-center gap-6">
+                    <div class="glass-card p-10 w-full md:w-64 text-center border-b-4 border-red-700">
+                        <i class="fas fa-shield-heart text-4xl text-red-600 mb-4"></i>
+                        <h5 class="font-bold uppercase tracking-widest text-sm mb-2">Seguridad</h5>
+                        <p class="text-xs text-gray-400 leading-tight">Sabemos qué esperar del otro. No hay sorpresas dolorosas.</p>
+                    </div>
+                    <div class="glass-card p-10 w-full md:w-64 text-center border-b-4 border-blue-400">
+                        <i class="fas fa-link text-4xl text-blue-400 mb-4"></i>
+                        <h5 class="font-bold uppercase tracking-widest text-sm mb-2">Presencia</h5>
+                        <p class="text-xs text-gray-400 leading-tight">A través de las tareas, estamos en la mente del otro cada día.</p>
+                    </div>
+                    <div class="glass-card p-10 w-full md:w-64 text-center border-b-4 border-rose-400">
+                        <i class="fas fa-spa text-4xl text-rose-400 mb-4"></i>
+                        <h5 class="font-bold uppercase tracking-widest text-sm mb-2">Cuidado</h5>
+                        <p class="text-xs text-gray-400 leading-tight">El placer y el bienestar de ambos son la prioridad máxima.</p>
+                    </div>
+                </div>
+                <div class="mt-16 bg-gradient-to-r from-red-950/40 via-black to-blue-950/40 p-8 rounded-full text-center border border-white/5">
+                    <p class="text-xl font-bold italic">"pues si papu."</p>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="mt-20 text-center pb-10">
+            <p class="text-xs text-gray-600 tracking-widest uppercase mb-4">Documento Confidencial de Vinculación</p>
+            <div class="flex justify-center space-x-6 text-red-900/40">
+                <i class="fas fa-lock"></i>
+                <i class="fas fa-infinity"></i>
+                <i class="fas fa-key"></i>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.add('hidden');
+                tab.classList.remove('block');
+            });
+            
+            const activeTab = document.getElementById(tabId);
+            activeTab.classList.remove('hidden');
+            activeTab.classList.add('block');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('text-gray-500');
+            });
+            event.target.classList.add('tab-active');
+            event.target.classList.remove('text-gray-500');
+        }
+    </script>
+</body>
+</html>

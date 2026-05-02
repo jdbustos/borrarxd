@@ -61,6 +61,20 @@
             background: #374151;
             border-radius: 10px;
         }
+        /* Estilo para el botón de redirección */
+        .btn-planner {
+            margin-top:20px;
+            background: linear-gradient(135deg, #7f1d1d 0%, #450a0a 100%);
+            border: 1px solid #991b1b;
+            box-shadow: 0 4px 15px rgba(155, 28, 28, 0.3);
+            transition: all 0.3s transform;
+        }
+
+        .btn-planner:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(155, 28, 28, 0.5);
+            background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+        }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(8px); }
@@ -80,8 +94,15 @@
                 <p class="text-gray-400 max-w-2xl text-lg italic leading-relaxed">
                     Diseñada para una relación a distancia (encuentros semanales), equilibrando estilos de apego, niveles de libido y exploración BDSM progresiva.
                 </p>
-                <div class="h-1 w-24 bg-red-800 mt-6 rounded-full"></div>
+                <div class="h-1 w-24 bg-red-800 mt-6 rounded-full"> </div>
+                <!-- NUEVO BOTÓN PARA INDEX.HTML -->
+            <div class="mb-8">
+                <a href="planificador.html" class="btn-planner inline-flex items-center px-6 py-3 rounded-full text-white font-bold uppercase tracking-widest text-sm">
+                    <i class="fas fa-calendar-alt mr-2"></i> Planificador de obediencia
+                </a>
             </div>
+            </div>
+            
         </header>
 
         <!-- Navegación -->
@@ -124,7 +145,10 @@
                             </p>
                         </div>
                     </div>
+                    
                 </div>
+
+                
             </section>
 
             <!-- Tab: Tareas -->
@@ -272,6 +296,8 @@
                     <p class="text-xl font-bold italic">"pues si papu."</p>
                 </div>
             </section>
+
+            
 
         </main>
 
